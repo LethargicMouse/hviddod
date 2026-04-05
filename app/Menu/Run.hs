@@ -4,7 +4,7 @@
 {-# LANGUAGE TypeOperators #-}
 
 module Menu.Run
-  ( runMenu,
+  ( run,
     AfterMenu (..),
   )
 where
@@ -26,10 +26,10 @@ data AfterMenu
   = QuitMenu
   | RunNewGame
 
-runMenu :: (IOE :> es, Reader Menu :> es) => Eff es AfterMenu
-runMenu =
+run :: (IOE :> es, Reader Menu :> es) => Eff es AfterMenu
+run =
   updateMenu >>= \case
-    Continue -> drawMenu >> runMenu
+    Continue -> drawMenu >> run
     Break fm -> pure fm
 
 updateMenu :: (IOE :> es) => Eff es MenuLoopControl

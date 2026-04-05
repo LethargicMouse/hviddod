@@ -2,6 +2,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeOperators #-}
 
 module Main (main) where
 
@@ -19,6 +20,10 @@ main = runEff $ do
   window <- createWindow "hviddod" defaultWindow
   renderer <- createRenderer window (-1) defaultRenderer
   menu <- createMenu $$ renderer
-  runMenu $$ menu >>= \case
+  runMenu window menu
+
+runMenu :: (IOE :> es) => Window -> Menu -> Eff es ()
+runMenu window menu =
+  run $$ menu >>= \case
     QuitMenu -> destroyWindow window
     RunNewGame -> undefined
