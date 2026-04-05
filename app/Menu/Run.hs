@@ -3,7 +3,11 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE TypeOperators #-}
 
-module Menu.Run (run) where
+module Menu.Run
+  ( runMenu,
+    AfterMenu (..),
+  )
+where
 
 import Effectful
 import Effectful.Reader.Static
@@ -11,28 +15,31 @@ import Menu.Create
 import Menu.Event
 import MyEffectful
 import MySDL.Render
-import SDL
 
-data Action
-  = QuitMenu
-  | RunNewGame
+data LoopControl a
+  = Break a
   | Continue
 
-run :: (IOE :> es, Reader Menu :> es) => Eff es ()
-run =
-  updateMenu >>= \case
-    Continue -> drawMenu >> run
-    QuitMenu -> destroyWindow =<< asks getWindow
-    RunNewGame -> undefined
+type MenuLoopControl = LoopControl AfterMenu
 
-updateMenu :: (IOE :> es) => Eff es Action
+data AfterMenu
+  = QuitMenu
+  | RunNewGame
+
+runMenu :: (IOE :> es, Reader Menu :> es) => Eff es AfterMenu
+runMenu =
+  updateMenu >>= \case
+    Continue -> drawMenu >> runMenu
+    Break fm -> pure fm
+
+updateMenu :: (IOE :> es) => Eff es MenuLoopControl
 updateMenu = handleMenuEvents <$> pollMenuEvents
 
-handleMenuEvents :: [MenuEvent] -> Action
+handleMenuEvents :: [MenuEvent] -> MenuLoopControl
 handleMenuEvents [] = Continue
 handleMenuEvents (e : _) = case e of
-  QuitMenuEvent -> QuitMenu
-  NewGameMenuEvent -> RunNewGame
+  QuitMenuEvent -> Break QuitMenu
+  NewGameMenuEvent -> Break RunNewGame
 
 drawMenu :: (IOE :> es, Reader Menu :> es) => Eff es ()
 drawMenu = do
