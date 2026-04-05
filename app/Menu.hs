@@ -4,7 +4,7 @@
 
 module Menu
   ( runMenu,
-    FromMenu (..),
+    AfterMenu (..),
   )
 where
 
@@ -17,7 +17,7 @@ data MenuEvent
   = QuitMenuEvent
   | NewGameMenuEvent
 
-runMenu :: (IOE :> es, Reader Renderer :> es) => Eff es FromMenu
+runMenu :: (IOE :> es, Reader Renderer :> es) => Eff es AfterMenu
 runMenu =
   updateMenu >>= \case
     Continue -> drawMenu >> runMenu
@@ -30,9 +30,9 @@ data LoopControl a
   = Break a
   | Continue
 
-type MenuLoopControl = LoopControl FromMenu
+type MenuLoopControl = LoopControl AfterMenu
 
-data FromMenu
+data AfterMenu
   = QuitMenu
   | RunNewGame
 
