@@ -1,48 +1,31 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TypeOperators #-}
 
-module MySDL
-  ( Event (..),
-    pollEvents,
-    clearBg,
+module MySDL.Render
+  ( clearBg,
     display,
     Color,
     black,
     white,
-    initAll,
     drawPicture,
     Picture (..),
     createText,
   )
 where
 
-import Data.Maybe
 import Data.Text hiding (copy)
 import Data.Word
 import Effectful
 import Effectful.Reader.Static
 import Foreign.C.Types
-import SDL hiding (Event, point, pollEvents)
-import qualified SDL
+import SDL hiding (point)
 import SDL.Font hiding (Color, height)
-import qualified SDL.Font as Font hiding (Color)
 
 type Color = V4 Word8
 
 black, white :: Color
 black = V4 0 0 0 255
 white = V4 255 255 255 255
-
-newtype Event
-  = KeyPress Keycode
-
-mkEvent :: SDL.Event -> Maybe Event
-mkEvent e = case eventPayload e of
-  KeyboardEvent ke ->
-    if keyboardEventKeyMotion ke == Pressed
-      then Just (KeyPress $ keysymKeycode $ keyboardEventKeysym ke)
-      else Nothing
-  _ -> Nothing
 
 clearBg :: (Reader Renderer :> es, IOE :> es) => Color -> Eff es ()
 clearBg color = do
@@ -52,14 +35,6 @@ clearBg color = do
 
 display :: (Reader Renderer :> es, IOE :> es) => Eff es ()
 display = present =<< ask
-
-pollEvents :: (IOE :> es) => Eff es [Event]
-pollEvents = mapMaybe mkEvent <$> SDL.pollEvents
-
-initAll :: (IOE :> es) => Eff es ()
-initAll = do
-  initializeAll
-  Font.initialize
 
 drawPicture :: (Reader Renderer :> es, IOE :> es) => Picture -> Eff es ()
 drawPicture (Picture texture rect) = do

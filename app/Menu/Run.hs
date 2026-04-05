@@ -14,7 +14,7 @@ import Effectful.Reader.Static
 import Menu.Create
 import Menu.Event
 import MyEffectful
-import MySDL
+import MySDL.Render
 
 data LoopControl a
   = Break a

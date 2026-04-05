@@ -9,7 +9,7 @@ where
 
 import Data.Maybe
 import Effectful
-import MySDL
+import MySDL.Event
 import SDL.Input.Keyboard.Codes
 
 data MenuEvent

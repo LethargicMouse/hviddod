@@ -9,12 +9,13 @@ import Effectful
 import Menu.Create
 import Menu.Run
 import MyEffectful
-import MySDL
 import SDL
+import qualified SDL.Font as Font
 
 main :: IO ()
 main = runEff $ do
-  initAll
+  initializeAll
+  Font.initialize
   window <- createWindow "hviddod" defaultWindow
   renderer <- createRenderer window (-1) defaultRenderer
   menu <- createMenu $$ renderer

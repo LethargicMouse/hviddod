@@ -13,7 +13,7 @@ import Data.Text hiding (index)
 import Effectful
 import Effectful.Reader.Static
 import Foreign.C.Types
-import MySDL
+import MySDL.Render
 import SDL
 import SDL.Font
 
