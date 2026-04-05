@@ -10,6 +10,7 @@ where
 import Data.Maybe
 import Effectful
 import MySDL
+import SDL.Input.Keyboard.Codes
 
 data MenuEvent
   = QuitMenuEvent

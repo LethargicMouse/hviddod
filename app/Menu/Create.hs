@@ -14,8 +14,8 @@ import Effectful
 import Effectful.Reader.Static
 import Foreign.C.Types
 import MySDL
+import SDL
 import SDL.Font
-import SDL.Vect
 
 data Menu
   = Menu

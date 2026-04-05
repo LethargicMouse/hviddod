@@ -3,8 +3,6 @@
 
 module MySDL
   ( Event (..),
-    module SDL.Input.Keyboard.Codes,
-    Renderer,
     pollEvents,
     clearBg,
     display,
@@ -12,18 +10,8 @@ module MySDL
     black,
     white,
     initAll,
-    createWindow,
-    defaultWindow,
-    createRenderer,
-    defaultRenderer,
-    destroyWindow,
-    Texture,
-    Rectangle,
     drawPicture,
     Picture (..),
-    Font,
-    Window,
-    load,
     createText,
   )
 where
@@ -38,7 +26,6 @@ import SDL hiding (Event, point, pollEvents)
 import qualified SDL
 import SDL.Font hiding (Color, height)
 import qualified SDL.Font as Font hiding (Color)
-import SDL.Input.Keyboard.Codes
 
 type Color = V4 Word8
 

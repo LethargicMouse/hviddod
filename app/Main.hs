@@ -10,6 +10,7 @@ import Menu.Create
 import Menu.Run
 import MyEffectful
 import MySDL
+import SDL
 
 main :: IO ()
 main = runEff $ do
