@@ -18,7 +18,8 @@ executable hviddod
     import:           warnings
     main-is:          Main.hs
     other-modules:
-      MySDL
+      MySDL,
+      Menu
     -- other-extensions:
     build-depends:
       base,
