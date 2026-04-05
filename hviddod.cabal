@@ -17,7 +17,8 @@ common warnings
 executable hviddod
     import:           warnings
     main-is:          Main.hs
-    -- other-modules:
+    other-modules:
+      MySDL
     -- other-extensions:
     build-depends:
       base,

@@ -7,19 +7,15 @@ module Main (main) where
 
 import Control.Monad
 import Data.Maybe
-import Data.Word
 import Effectful
 import Effectful.Reader.Static
-import SDL
+import MySDL
 
 data LoopControl
   = Break
   | Continue
 
-newtype Input
-  = KeyPress Keycode
-
-data MenuInput
+data MenuEvent
   = QuitMenu
   | RunNewGame
 
@@ -44,15 +40,15 @@ runMenu = do
   unless (isBreak lc) (drawMenu >> runMenu)
 
 updateMenu :: (IOE :> es) => Eff es LoopControl
-updateMenu = handleMenuEvents <$> pollEvents
+updateMenu = handleMenuEvents <$> pollMenuEvents
 
-handleMenuEvents :: [Event] -> LoopControl
-handleMenuEvents = handleMenuInputs . mapMaybe (toMenuInput <=< toInput)
+pollMenuEvents :: (IOE :> es) => Eff es [MenuEvent]
+pollMenuEvents = mapMaybe toMenuEvent <$> pollEvents
 
-toMenuInput :: Input -> Maybe MenuInput
-toMenuInput (KeyPress key) = keyToMenuInput key
+toMenuEvent :: Event -> Maybe MenuEvent
+toMenuEvent (KeyPress key) = keyToMenuInput key
 
-keyToMenuInput :: Keycode -> Maybe MenuInput
+keyToMenuInput :: Keycode -> Maybe MenuEvent
 keyToMenuInput k = case k of
   KeycodeQ -> Just QuitMenu
   KeycodeN -> Just RunNewGame
@@ -60,33 +56,13 @@ keyToMenuInput k = case k of
   KeycodeEscape -> Just QuitMenu
   _ -> Nothing
 
-handleMenuInputs :: [MenuInput] -> LoopControl
-handleMenuInputs [] = Continue
-handleMenuInputs (e : _) = case e of
+handleMenuEvents :: [MenuEvent] -> LoopControl
+handleMenuEvents [] = Continue
+handleMenuEvents (e : _) = case e of
   QuitMenu -> Break
   RunNewGame -> undefined
 
-toInput :: Event -> Maybe Input
-toInput e = case eventPayload e of
-  KeyboardEvent ke ->
-    if keyboardEventKeyMotion ke == Pressed
-      then Just (KeyPress $ keysymKeycode $ keyboardEventKeysym ke)
-      else Nothing
-  _ -> Nothing
-
 drawMenu :: (IOE :> es, Reader Renderer :> es) => Eff es ()
 drawMenu = do
-  clearBg black
+  clearBg Black
   display
-
-display :: (Reader Renderer :> es, IOE :> es) => Eff es ()
-display = present =<< ask
-
-clearBg :: (Reader Renderer :> es, IOE :> es) => V4 Word8 -> Eff es ()
-clearBg color = do
-  renderer <- ask
-  rendererDrawColor renderer $= color
-  clear renderer
-
-black :: V4 Word8
-black = V4 0 0 0 255
