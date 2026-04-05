@@ -19,7 +19,8 @@ executable hviddod
     main-is:          Main.hs
     other-modules:
       MySDL,
-      Menu
+      Menu.Run,
+      Menu.Event
     -- other-extensions:
     build-depends:
       base,

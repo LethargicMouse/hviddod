@@ -2,20 +2,17 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE TypeOperators #-}
 
-module Menu
+module Menu.Run
   ( runMenu,
     AfterMenu (..),
+    pollMenuEvents,
   )
 where
 
-import Data.Maybe
 import Effectful
 import Effectful.Reader.Static
+import Menu.Event
 import MySDL
-
-data MenuEvent
-  = QuitMenuEvent
-  | NewGameMenuEvent
 
 runMenu :: (IOE :> es, Reader Renderer :> es) => Eff es AfterMenu
 runMenu =
@@ -25,30 +22,6 @@ runMenu =
 
 updateMenu :: (IOE :> es) => Eff es MenuLoopControl
 updateMenu = handleMenuEvents <$> pollMenuEvents
-
-data LoopControl a
-  = Break a
-  | Continue
-
-type MenuLoopControl = LoopControl AfterMenu
-
-data AfterMenu
-  = QuitMenu
-  | RunNewGame
-
-pollMenuEvents :: (IOE :> es) => Eff es [MenuEvent]
-pollMenuEvents = mapMaybe toMenuEvent <$> pollEvents
-
-toMenuEvent :: Event -> Maybe MenuEvent
-toMenuEvent (KeyPress key) = keyToMenuInput key
-
-keyToMenuInput :: Keycode -> Maybe MenuEvent
-keyToMenuInput k = case k of
-  KeycodeQ -> Just QuitMenuEvent
-  KeycodeN -> Just NewGameMenuEvent
-  KeycodeCapsLock -> Just QuitMenuEvent
-  KeycodeEscape -> Just QuitMenuEvent
-  _ -> Nothing
 
 handleMenuEvents :: [MenuEvent] -> MenuLoopControl
 handleMenuEvents [] = Continue
@@ -60,3 +33,13 @@ drawMenu :: (IOE :> es, Reader Renderer :> es) => Eff es ()
 drawMenu = do
   clearBg Black
   display
+
+data LoopControl a
+  = Break a
+  | Continue
+
+type MenuLoopControl = LoopControl AfterMenu
+
+data AfterMenu
+  = QuitMenu
+  | RunNewGame
