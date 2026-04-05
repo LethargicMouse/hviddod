@@ -8,6 +8,7 @@ module Main (main) where
 
 import Effectful
 import Effectful.Reader.Static
+import Menu.Create
 import Menu.Run
 import MySDL
 

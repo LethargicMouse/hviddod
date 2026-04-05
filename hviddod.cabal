@@ -20,7 +20,8 @@ executable hviddod
     other-modules:
       MySDL,
       Menu.Run,
-      Menu.Event
+      Menu.Event,
+      Menu.Create
     -- other-extensions:
     build-depends:
       base,
