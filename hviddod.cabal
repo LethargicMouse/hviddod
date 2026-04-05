@@ -19,6 +19,7 @@ executable hviddod
     main-is:          Main.hs
     other-modules:
       MySDL,
+      MyEffectful,
       Menu.Run,
       Menu.Event,
       Menu.Create

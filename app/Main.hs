@@ -2,14 +2,13 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeOperators #-}
 
 module Main (main) where
 
 import Effectful
-import Effectful.Reader.Static
 import Menu.Create
 import Menu.Run
+import MyEffectful
 import MySDL
 
 main :: IO ()
@@ -21,6 +20,3 @@ main = runEff $ do
   runMenu $$ menu >>= \case
     QuitMenu -> destroyWindow window
     RunNewGame -> undefined
-
-($$) :: Eff (Reader r : es) a -> r -> Eff es a
-m $$ r = runReader r m

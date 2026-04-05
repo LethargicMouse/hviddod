@@ -13,6 +13,7 @@ import Effectful
 import Effectful.Reader.Static
 import Menu.Create
 import Menu.Event
+import MyEffectful
 import MySDL
 
 data LoopControl a
@@ -48,9 +49,3 @@ drawMenu = do
 
 drawButtons :: (Reader Menu :> es, IOE :> es) => Eff es ()
 drawButtons = mapM_ (withR getRenderer . drawPicture) =<< asks getButtons
-
-($.) :: (Reader r1 :> es) => Eff (Reader r2 : es) a -> (r1 -> r2) -> Eff es a
-m $. f = withR f m
-
-withR :: (Reader r1 :> es) => (r1 -> r2) -> Eff (Reader r2 : es) a -> Eff es a
-withR f = subsume . withReader f
