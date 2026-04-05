@@ -13,10 +13,11 @@ import MySDL
 
 main :: IO ()
 main = runEff $ do
-  initializeAll
+  initAll
   window <- createWindow "hviddod" defaultWindow
   renderer <- createRenderer window (-1) defaultRenderer
-  runMenu $$ renderer >>= \case
+  menu <- createMenu $$ renderer
+  runMenu $$ menu >>= \case
     QuitMenu -> destroyWindow window
     RunNewGame -> undefined
 
