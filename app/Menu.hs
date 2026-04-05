@@ -1,36 +1,40 @@
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE TypeOperators #-}
 
 module Menu
   ( runMenu,
+    FromMenu (..),
   )
 where
 
-import Control.Monad
 import Data.Maybe
 import Effectful
 import Effectful.Reader.Static
 import MySDL
 
 data MenuEvent
-  = QuitMenu
-  | RunNewGame
+  = QuitMenuEvent
+  | NewGameMenuEvent
 
-runMenu :: (IOE :> es, Reader Renderer :> es) => Eff es ()
-runMenu = do
-  lc <- updateMenu
-  unless (isBreak lc) (drawMenu >> runMenu)
+runMenu :: (IOE :> es, Reader Renderer :> es) => Eff es FromMenu
+runMenu =
+  updateMenu >>= \case
+    Continue -> drawMenu >> runMenu
+    Break fm -> pure fm
 
-updateMenu :: (IOE :> es) => Eff es LoopControl
+updateMenu :: (IOE :> es) => Eff es MenuLoopControl
 updateMenu = handleMenuEvents <$> pollMenuEvents
 
-data LoopControl
-  = Break
+data LoopControl a
+  = Break a
   | Continue
 
-isBreak :: LoopControl -> Bool
-isBreak Break = True
-isBreak _ = False
+type MenuLoopControl = LoopControl FromMenu
+
+data FromMenu
+  = QuitMenu
+  | RunNewGame
 
 pollMenuEvents :: (IOE :> es) => Eff es [MenuEvent]
 pollMenuEvents = mapMaybe toMenuEvent <$> pollEvents
@@ -40,17 +44,17 @@ toMenuEvent (KeyPress key) = keyToMenuInput key
 
 keyToMenuInput :: Keycode -> Maybe MenuEvent
 keyToMenuInput k = case k of
-  KeycodeQ -> Just QuitMenu
-  KeycodeN -> Just RunNewGame
-  KeycodeCapsLock -> Just QuitMenu
-  KeycodeEscape -> Just QuitMenu
+  KeycodeQ -> Just QuitMenuEvent
+  KeycodeN -> Just NewGameMenuEvent
+  KeycodeCapsLock -> Just QuitMenuEvent
+  KeycodeEscape -> Just QuitMenuEvent
   _ -> Nothing
 
-handleMenuEvents :: [MenuEvent] -> LoopControl
+handleMenuEvents :: [MenuEvent] -> MenuLoopControl
 handleMenuEvents [] = Continue
 handleMenuEvents (e : _) = case e of
-  QuitMenu -> Break
-  RunNewGame -> undefined
+  QuitMenuEvent -> Break QuitMenu
+  NewGameMenuEvent -> Break RunNewGame
 
 drawMenu :: (IOE :> es, Reader Renderer :> es) => Eff es ()
 drawMenu = do
