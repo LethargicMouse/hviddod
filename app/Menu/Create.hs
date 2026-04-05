@@ -20,15 +20,16 @@ import SDL.Font
 data Menu
   = Menu
   { getButtons :: [Picture],
+    getWindow :: Window,
     getRenderer :: Renderer
   }
 
-createMenu :: (IOE :> es, Reader Renderer :> es) => Eff es Menu
-createMenu = do
+createMenu :: (IOE :> es, Reader Renderer :> es) => Window -> Eff es Menu
+createMenu window = do
   font <- load "font.ttf" 50
   buttons <- zipWithM (createButton font) [1 ..] ["[N]ew Game", "[Q]uit"]
   free font
-  Menu buttons <$> ask
+  Menu buttons window <$> ask
 
 createButton :: (IOE :> es, Reader Renderer :> es) => Font -> CInt -> Text -> Eff es Picture
 createButton font index text = createText font text (P $ V2 50 $ (index + 1) * 100)

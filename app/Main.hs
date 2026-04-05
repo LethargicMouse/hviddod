@@ -1,6 +1,5 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Main (main) where
@@ -18,7 +17,5 @@ main = runEff $ do
   Font.initialize
   window <- createWindow "hviddod" defaultWindow
   renderer <- createRenderer window (-1) defaultRenderer
-  menu <- createMenu $$ renderer
-  runMenu $$ menu >>= \case
-    QuitMenu -> destroyWindow window
-    RunNewGame -> undefined
+  menu <- createMenu window $$ renderer
+  run $$ menu
